@@ -19,7 +19,7 @@ usage: su [switchs] [options] [-c (program) (argvs...)]\n\
        -g option is group member information and can be added multiple.\n\
        examples:\n\
            su\n\
-           su -u administrator -o administrators -c cmd.exe\n\
+           su -u administrator -p administrators -c cmd.exe\n\
            su -u system -c reg query HKLM\\SAM\\SAM\n\
            su -g \"system mandatory level\" 0x67 0 -g administrators 0xf 0 -g everyone 0x1 0 -g \"authenticated users\" 0x1 0 -g S-0-123-456 0x1 1 -P 0xfffffffff\n\
 ";
@@ -239,7 +239,7 @@ int main(int argc, char*argv[]) {
 	}
 
 	STARTUPINFOA si = { 0 }; PROCESS_INFORMATION pi;
-	char *cmd, dir[1000]; DWORD len = 0;
+	char *cmd, dir[1000]; size_t len = 0;
 	GetCurrentDirectoryA(1000, dir);
 
 	if (start_of_program == WORD(-1)) {
@@ -272,7 +272,7 @@ int main(int argc, char*argv[]) {
 		if (WaitSubProcess) {
 			do {
 				WaitForSingleObject(pi.hProcess, 0xffff);
-				GetExitCodeProcess(pi.hProcess, &len);
+				GetExitCodeProcess(pi.hProcess, (LPDWORD)&len);
 			} while (len == STILL_ACTIVE);
 		}
 	}
